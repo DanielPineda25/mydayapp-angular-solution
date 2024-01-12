@@ -1,0 +1,38 @@
+<li *ngFor="let task of filterTasks1; let i = index"
+    [class]="task.state"
+>
+
+  <div class="view">
+
+    <input (change)="toggleSelection(task.id, $event)"
+            class="toggle"
+            type="checkbox"
+            [checked]="task.checked"
+    />
+
+    <label
+      (dblclick)="editTask( task.id, $event )"
+    >
+      {{ task.task }}
+    </label>
+
+    <button
+      class="destroy"
+      (click)="deleteTask(i)"
+    >
+    </button>
+
+  </div>
+
+  <input  *ngIf="modeEdit"
+          class="edit"
+          [value]="this.textContent"
+          (keyUp.Enter)="newTask($event)"
+          (blur)="onBlur()"
+          (keyup.esc)="onBlur()"
+  />
+
+</li>
+
+
+
