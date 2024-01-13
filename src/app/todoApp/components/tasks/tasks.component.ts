@@ -28,7 +28,7 @@ export class TasksComponent implements OnInit, DoCheck {
 
   filterTasks1: StateTask[] = []; // copia filtrada de las tareas, según su clase
 
-  //filterTasks() filtrará las tareas a mostrar por clase, según la url donde esté
+  //filterTasks() filtrará las tareas a mostrar por clase, según la url donde esté (optimizar código)
   filterTasks() {
     if (this.router.url.includes('all')) {
       this.filterTasks1 = this.tasks.filter(task => task.state === '' || task.state === 'completed'|| task.state === 'editing');
@@ -46,10 +46,12 @@ export class TasksComponent implements OnInit, DoCheck {
       this.tasks.find(task => task.id === id)!.state = 'completed';
       this.tasks.find(task => task.id === id)!.checked = true;
       this.filterTasks();
+      this.todoService.saveLocalStorage();
     } else{
       this.tasks.find(task => task.id === id)!.state = '';
       this.tasks.find(task => task.id === id)!.checked = false;
       this.filterTasks();
+      this.todoService.saveLocalStorage();
     }
 
   }
@@ -65,6 +67,9 @@ export class TasksComponent implements OnInit, DoCheck {
   public contentTask: string = '';
   public confirmTask: boolean = false;
 
+  //Esto de aqui para abajo debería ir en el servicio
+
+  //Se entra en modo edicion, sobrepone el input para escribir
   editTask(id: any, event: any){
 
     this.modeEdit = true;
@@ -72,16 +77,21 @@ export class TasksComponent implements OnInit, DoCheck {
     this.textContent = (event.target as HTMLLabelElement).textContent!.trim();
     this.idForChange = id;
 
+    setInterval(()=>{
+      this.inputFocus(id)
+    },100)
+
   }
 
+  //Se guarda el contenido del input con la tarea nueva
   newTask( content: any ){
     if( content.target.value === '' ) return;
     this.contentTask = content.target.value
     this.confirmTask = true;
-    console.log(this.contentTask);
     this.createNewTask(this.idForChange)
   }
 
+  //Se le asigna el nuevo contenido al mismo elemento que se había ocultado
   createNewTask( id: any){
 
     if( this.confirmTask ){
@@ -90,14 +100,24 @@ export class TasksComponent implements OnInit, DoCheck {
       this.filterTasks1.find(task => task.id === id)!.state = '';
       this.filterTasks1.find(task => task.id === id)!.checked = false;
       this.modeEdit = false;
-      console.log(this.filterTasks1)
+      this.todoService.saveLocalStorage();
+
     }
   }
 
+  //Se anula el modo de edicion y se vuelve al estado pending
   onBlur(){
     this.modeEdit = false;
     this.filterTasks1.find(task => task.id === this.idForChange)!.state = '';
+    this.filterTasks1.find(task => task.id === this.idForChange)!.checked = false;
+  }
+
+  //Enfocar el input para la edición
+  inputFocus(id:any){
+    if(!this.modeEdit) return;
+    const myInput = document.getElementById(id);
+    myInput!.focus();
   }
 
 }
-;
+

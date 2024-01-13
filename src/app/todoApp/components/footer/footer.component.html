@@ -1,6 +1,6 @@
 <footer class="footer" *ngIf="displayFooter">
   <!-- This should be `0 items left` by default -->
-  <span class="todo-count"><strong>{{ taskListLength }}</strong> item left</span>
+  <span class="todo-count"><strong>{{ taskListLength }}</strong> {{ taskListLength | i18nPlural: itemsMap}} left</span>
   <!-- Remove this if you don't implement routing -->
   <ul class="filters">
     <li>
